@@ -1,6 +1,6 @@
 import { Type } from '@monument/core';
 import { Actions, EffectMediator, ErrorMediator, Errors, Store } from '@monument/store';
-import { Inject, InjectionToken, ModuleWithProviders, NgModule, Optional } from '@angular/core';
+import { Inject, InjectionToken, ModuleWithProviders, NgModule, Optional, Provider } from '@angular/core';
 
 const STORE: InjectionToken<Store<any, any>> = new InjectionToken('STORE');
 const EFFECTS: InjectionToken<Array<object>> = new InjectionToken('EFFECTS');
@@ -15,78 +15,82 @@ export interface StoreModuleConfiguration {
 @NgModule()
 export class StoreModule {
   static forRoot(configuration: StoreModuleConfiguration = {}): ModuleWithProviders {
+    const providers: Provider[] = [
+      {
+        provide: Actions,
+        useFactory() {
+          return new Actions();
+        }
+      },
+      {
+        provide: Errors,
+        useFactory() {
+          return new Errors();
+        }
+      },
+      ...(configuration.store ? [
+        {
+          provide: configuration.store,
+          useClass: configuration.store
+        },
+        {
+          provide: STORE,
+          useExisting: configuration.store
+        }
+      ] : []),
+      ...(configuration.effects || []).map(effectsClass => {
+        return {
+          provide: EFFECTS,
+          useClass: effectsClass,
+          multi: true
+        };
+      }),
+      ...(configuration.errorHandlers || []).map(errorHandlerClass => {
+        return {
+          provide: ERROR_HANDLERS,
+          useClass: errorHandlerClass,
+          multi: true
+        };
+      })
+    ];
+
     return {
       ngModule: StoreModule,
-      providers: [
-        {
-          provide: Actions,
-          useFactory() {
-            return new Actions();
-          }
-        },
-        {
-          provide: Errors,
-          useFactory() {
-            return new Errors();
-          }
-        },
-        ...(configuration.store ? [
-          {
-            provide: configuration.store,
-            useClass: configuration.store
-          },
-          {
-            provide: STORE,
-            useExisting: configuration.store
-          }
-        ] : []),
-        ...(configuration.effects || []).map(effectsClass => {
-          return {
-            provide: EFFECTS,
-            useClass: effectsClass,
-            multi: true
-          };
-        }),
-        ...(configuration.errorHandlers || []).map(errorHandlerClass => {
-          return {
-            provide: ERROR_HANDLERS,
-            useClass: errorHandlerClass,
-            multi: true
-          };
-        })
-      ]
+      providers: providers
     };
   }
 
   static forFeature(configuration: StoreModuleConfiguration): ModuleWithProviders {
+    const providers: Provider[] = [
+      ...(configuration.store ? [
+        {
+          provide: configuration.store,
+          useClass: configuration.store
+        },
+        {
+          provide: STORE,
+          useExisting: configuration.store
+        }
+      ] : []),
+      ...(configuration.effects || []).map(effectsClass => {
+        return {
+          provide: EFFECTS,
+          useClass: effectsClass,
+          multi: true
+        };
+      }),
+      ...(configuration.errorHandlers || []).map(errorHandlerClass => {
+        return {
+          provide: ERROR_HANDLERS,
+          useClass: errorHandlerClass,
+          multi: true
+        };
+      })
+    ];
+
     return {
       ngModule: StoreModule,
-      providers: [
-        ...(configuration.store ? [
-          {
-            provide: configuration.store,
-            useClass: configuration.store
-          },
-          {
-            provide: STORE,
-            useExisting: configuration.store
-          }
-        ] : []),
-        ...(configuration.effects || []).map(effectsClass => {
-          return {
-            provide: EFFECTS,
-            useClass: effectsClass,
-            multi: true
-          };
-        }),
-        ...(configuration.errorHandlers || []).map(errorHandlerClass => {
-          return {
-            provide: ERROR_HANDLERS,
-            useClass: errorHandlerClass,
-            multi: true
-          };
-        })
-      ]
+      providers: providers
     };
   }
 

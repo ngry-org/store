@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build:store": "ng build store && cp -r projects/store/src/schema ./dist/store/schema",
+    "build:store": "ng build store",
     "test": "ng test",
     "test:watch": "ng test --watch",
     "lint": "ng lint",
