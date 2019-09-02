@@ -1,0 +1,49 @@
+{
+  "name": "store",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build:store": "ng build store && cp -r projects/store/src/schema ./dist/store/schema",
+    "test": "ng test",
+    "test:watch": "ng test --watch",
+    "lint": "ng lint",
+    "e2e": "ng e2e",
+    "publish:store": "npm run build:store && cd dist/store && npm publish --access public"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "~8.2.4",
+    "@angular/common": "~8.2.4",
+    "@angular/compiler": "~8.2.4",
+    "@angular/core": "~8.2.4",
+    "@angular/forms": "~8.2.4",
+    "@angular/platform-browser": "~8.2.4",
+    "@angular/platform-browser-dynamic": "~8.2.4",
+    "@angular/router": "~8.2.4",
+    "@monument/assert": "^0.14.0",
+    "@monument/core": "^0.15.0",
+    "@monument/store": "^0.15.0",
+    "rxjs": "~6.5.2",
+    "tslib": "^1.10.0",
+    "zone.js": "~0.9.1"
+  },
+  "devDependencies": {
+    "@angular-builders/jest": "^8.2.0",
+    "@angular-devkit/build-angular": "~0.803.1",
+    "@angular-devkit/build-ng-packagr": "~0.803.1",
+    "@angular/cli": "~8.3.1",
+    "@angular/compiler-cli": "~8.2.4",
+    "@angular/language-service": "~8.2.4",
+    "@types/jest": "^24.0.18",
+    "@types/node": "~12.7.2",
+    "codelyzer": "^5.1.0",
+    "jest": "^24.9.0",
+    "lerna": "^3.16.4",
+    "ng-packagr": "^5.5.0",
+    "ts-node": "~8.3.0",
+    "tsickle": "^0.37.0",
+    "tslint": "~5.19.0",
+    "typescript": "~3.4.3"
+  }
+}

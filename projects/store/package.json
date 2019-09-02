@@ -1,0 +1,29 @@
+{
+  "name": "@ngry/store",
+  "version": "1.0.0",
+  "description": "Angular store",
+  "keywords": [
+    "angular",
+    "store"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ngry-org/store"
+  },
+  "maintainers": [
+    {
+      "name": "Alex Chugaev",
+      "url": "https://github.com/avchugaev"
+    }
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@angular/common": "^8.2.4",
+    "@angular/core": "^8.2.4",
+    "@monument/assert": "^0.15.0",
+    "@monument/core": "^0.15.0",
+    "@monument/store": "^0.15.0"
+  }
+}
