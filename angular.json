@@ -7,7 +7,7 @@
       "projectType": "library",
       "root": "projects/store",
       "sourceRoot": "projects/store/src",
-      "prefix": "lib",
+      "prefix": "ngry",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
@@ -32,12 +32,10 @@
             ],
             "exclude": [
               "**/node_modules/**"
-            ],
-            "format": "stylish"
+            ]
           }
         }
       }
-    }
-  },
+    }},
   "defaultProject": "store"
 }

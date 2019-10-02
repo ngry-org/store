@@ -40,10 +40,6 @@
       "timeEnd",
       "trace"
     ],
-    "variable-name": [
-      true,
-      "allow-leading-underscore"
-    ],
     "no-empty": false,
     "no-inferrable-types": [
       true,

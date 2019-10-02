@@ -9,6 +9,7 @@
     "downlevelIteration": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "node",
     "importHelpers": true,
@@ -21,10 +22,10 @@
       "dom"
     ],
     "paths": {
-      "@ngry/store": [
+      "store": [
         "dist/store"
       ],
-      "@ngry/store/*": [
+      "store/*": [
         "dist/store/*"
       ]
     }

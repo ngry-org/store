@@ -1,6 +1,6 @@
 import { map, tap } from 'rxjs/operators';
 import { RuntimeException } from '@monument/core';
-import { Action, Actions, Catch, Effect, EffectSource, Errors, Reaction, State, Store } from '@monument/store';
+import { Action, Actions, Catch, Effect, Errors, Reaction, State, Store } from '@monument/store';
 import { Injectable } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { StoreModule } from './store.module';
@@ -18,19 +18,22 @@ interface Product {
 class Load implements Action {
   readonly type = LOAD;
 
-  constructor(readonly success: boolean) {}
+  constructor(readonly success: boolean) {
+  }
 }
 
 class LoadSuccess implements Action {
   readonly type = LOAD_SUCCESS;
 
-  constructor(readonly products: Product[]) {}
+  constructor(readonly products: Product[]) {
+  }
 }
 
 class LoadFail implements Action {
   readonly type = LOAD_FAIL;
 
-  constructor(readonly error: CartException) {}
+  constructor(readonly error: CartException) {
+  }
 }
 
 interface CartStateSnapshot {
@@ -99,8 +102,8 @@ class CartStore extends Store<CartStateSnapshot, CartState> {
 @Injectable()
 class CartEffects {
   @Effect()
-  readonly load: EffectSource = this.actions.ofType<Load>(LOAD).pipe(
-    map(action => {
+  readonly load = this.actions.ofType<Load>(LOAD).pipe(
+    map((action: Load) => {
       if (action.success) {
         return new LoadSuccess([
           {
@@ -119,7 +122,7 @@ class CartEffects {
   );
 
   @Effect({dispatch: false})
-  readonly loadFail: EffectSource = this.actions.ofType<LoadFail>(LOAD_FAIL).pipe(
+  readonly loadFail = this.actions.ofType<LoadFail>(LOAD_FAIL).pipe(
     tap(action => {
       this.errors.next(action.error);
     })
@@ -137,9 +140,9 @@ class CartErrorHandlers {
   }
 }
 
-function testStoreModule(description: string, setup: Function) {
+function testStoreModule(description: string, setup: () => void) {
   describe('StoreModule', () => {
-    describe(description, function () {
+    describe(description, () => {
       let actions: Actions;
       let errors: Errors;
       let cartStore: CartStore;
@@ -244,5 +247,25 @@ testStoreModule('forFeature()', () => {
         errorHandlers: [CartErrorHandlers]
       })
     ]
+  });
+});
+
+describe('StoreModule', () => {
+  describe('forRoot() only', () => {
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        imports: [
+          StoreModule.forRoot()
+        ]
+      });
+    });
+
+    it('should provide Actions stream', () => {
+      expect(TestBed.get(Actions)).toBeInstanceOf(Actions);
+    });
+
+    it('should provide Errors stream', () => {
+      expect(TestBed.get(Errors)).toBeInstanceOf(Errors);
+    });
   });
 });

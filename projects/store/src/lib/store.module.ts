@@ -56,7 +56,7 @@ export class StoreModule {
 
     return {
       ngModule: StoreModule,
-      providers: providers
+      providers
     };
   }
 
@@ -90,7 +90,7 @@ export class StoreModule {
 
     return {
       ngModule: StoreModule,
-      providers: providers
+      providers
     };
   }
 

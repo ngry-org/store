@@ -1,6 +1,6 @@
-# Translate
+# Store
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.1.1.
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.2.8.
 
 ## Code scaffolding
 
