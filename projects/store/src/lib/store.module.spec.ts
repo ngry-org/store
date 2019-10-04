@@ -225,18 +225,6 @@ function testStoreModule(description: string, setup: () => void) {
   });
 }
 
-testStoreModule('forRoot()', () => {
-  TestBed.configureTestingModule({
-    imports: [
-      StoreModule.forRoot({
-        store: CartStore,
-        effects: [CartEffects],
-        errorHandlers: [CartErrorHandlers]
-      })
-    ]
-  });
-});
-
 testStoreModule('forFeature()', () => {
   TestBed.configureTestingModule({
     imports: [

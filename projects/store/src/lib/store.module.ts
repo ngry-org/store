@@ -12,56 +12,59 @@ export interface StoreModuleConfiguration {
   readonly errorHandlers?: Array<Type<object>>;
 }
 
+export function ActionsFactory(): Actions {
+  return new Actions();
+}
+
+export function ErrorsFactory(): Errors {
+  return new Errors();
+}
+
+export function ConvertEffectsToProviders(effects: Array<Type<object>> = []): Provider[] {
+  return effects.map(effectsClass => {
+    return {
+      provide: EFFECTS,
+      useClass: effectsClass,
+      multi: true
+    };
+  });
+}
+
+export function ConvertErrorHandlersToProviders(effects: Array<Type<object>> = []): Provider[] {
+  return effects.map(errorHandlerClass => {
+    return {
+      provide: ERROR_HANDLERS,
+      useClass: errorHandlerClass,
+      multi: true
+    };
+  });
+}
+
+@NgModule({
+  providers: [
+    {
+      provide: Actions,
+      useFactory: ActionsFactory
+    },
+    {
+      provide: Errors,
+      useFactory: ErrorsFactory
+    }
+  ]
+})
+export class StoreRootModule {
+}
+
 @NgModule()
 export class StoreModule {
-  static forRoot(configuration: StoreModuleConfiguration = {}): ModuleWithProviders {
-    const providers: Provider[] = [
-      {
-        provide: Actions,
-        useFactory() {
-          return new Actions();
-        }
-      },
-      {
-        provide: Errors,
-        useFactory() {
-          return new Errors();
-        }
-      },
-      ...(configuration.store ? [
-        {
-          provide: configuration.store,
-          useClass: configuration.store
-        },
-        {
-          provide: STORE,
-          useExisting: configuration.store
-        }
-      ] : []),
-      ...(configuration.effects || []).map(effectsClass => {
-        return {
-          provide: EFFECTS,
-          useClass: effectsClass,
-          multi: true
-        };
-      }),
-      ...(configuration.errorHandlers || []).map(errorHandlerClass => {
-        return {
-          provide: ERROR_HANDLERS,
-          useClass: errorHandlerClass,
-          multi: true
-        };
-      })
-    ];
-
+  static forRoot(): ModuleWithProviders {
     return {
-      ngModule: StoreModule,
-      providers
+      ngModule: StoreRootModule
     };
   }
 
   static forFeature(configuration: StoreModuleConfiguration): ModuleWithProviders {
-    const providers: Provider[] = [
+    const providers = [
       ...(configuration.store ? [
         {
           provide: configuration.store,
@@ -72,20 +75,8 @@ export class StoreModule {
           useExisting: configuration.store
         }
       ] : []),
-      ...(configuration.effects || []).map(effectsClass => {
-        return {
-          provide: EFFECTS,
-          useClass: effectsClass,
-          multi: true
-        };
-      }),
-      ...(configuration.errorHandlers || []).map(errorHandlerClass => {
-        return {
-          provide: ERROR_HANDLERS,
-          useClass: errorHandlerClass,
-          multi: true
-        };
-      })
+      ...ConvertEffectsToProviders(configuration.effects),
+      ...ConvertErrorHandlersToProviders(configuration.errorHandlers)
     ];
 
     return {

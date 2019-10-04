@@ -13,6 +13,7 @@
       true,
       "rxjs/Rx"
     ],
+    "only-arrow-functions": false,
     "interface-name": false,
     "max-classes-per-file": false,
     "max-line-length": [
