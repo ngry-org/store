@@ -9,7 +9,7 @@
     "test:watch": "ng test --watch",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "publish:store": "npm run build && cd dist/store && npm publish --access public"
+    "deploy": "npm run build && cd dist/store && npm publish --access public"
   },
   "private": true,
   "dependencies": {
