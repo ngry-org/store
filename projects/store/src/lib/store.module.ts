@@ -55,6 +55,27 @@ export function ConvertErrorHandlersToProviders(effects: Array<Type<object>> = [
 export class StoreRootModule {
 }
 
+@NgModule({
+  imports: [
+    StoreRootModule
+  ]
+})
+export class StoreFeatureModule {
+  private effectMediator: EffectMediator;
+  private errorMediator: ErrorMediator;
+
+  constructor(
+    actions: Actions,
+    errors: Errors,
+    @Optional() @Inject(STORE) store: Store<any, any> | null,
+    @Optional() @Inject(EFFECTS) effects: Array<object> | null,
+    @Optional() @Inject(ERROR_HANDLERS) errorHandlers: Array<object> | null
+  ) {
+    this.effectMediator = new EffectMediator(actions, effects || []);
+    this.errorMediator = new ErrorMediator(errors, errorHandlers || []);
+  }
+}
+
 @NgModule()
 export class StoreModule {
   static forRoot(): ModuleWithProviders {
@@ -80,22 +101,8 @@ export class StoreModule {
     ];
 
     return {
-      ngModule: StoreModule,
+      ngModule: StoreFeatureModule,
       providers
     };
-  }
-
-  private effectMediator: EffectMediator;
-  private errorMediator: ErrorMediator;
-
-  constructor(
-    actions: Actions,
-    errors: Errors,
-    @Optional() @Inject(STORE) store: Store<any, any> | null,
-    @Optional() @Inject(EFFECTS) effects: Array<object> | null,
-    @Optional() @Inject(ERROR_HANDLERS) errorHandlers: Array<object> | null
-  ) {
-    this.effectMediator = new EffectMediator(actions, effects || []);
-    this.errorMediator = new ErrorMediator(errors, errorHandlers || []);
   }
 }
