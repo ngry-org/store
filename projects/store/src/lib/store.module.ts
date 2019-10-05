@@ -76,6 +76,7 @@ export class StoreFeatureModule {
   }
 }
 
+// @dynamic
 @NgModule()
 export class StoreModule {
   static forRoot(): ModuleWithProviders {
@@ -85,24 +86,22 @@ export class StoreModule {
   }
 
   static forFeature(configuration: StoreModuleConfiguration): ModuleWithProviders {
-    const providers = [
-      ...(configuration.store ? [
-        {
-          provide: configuration.store,
-          useClass: configuration.store
-        },
-        {
-          provide: STORE,
-          useExisting: configuration.store
-        }
-      ] : []),
-      ...ConvertEffectsToProviders(configuration.effects),
-      ...ConvertErrorHandlersToProviders(configuration.errorHandlers)
-    ];
-
     return {
       ngModule: StoreFeatureModule,
-      providers
+      providers: [
+        ...(configuration.store ? [
+          {
+            provide: configuration.store,
+            useClass: configuration.store
+          },
+          {
+            provide: STORE,
+            useExisting: configuration.store
+          }
+        ] : []),
+        ...ConvertEffectsToProviders(configuration.effects),
+        ...ConvertErrorHandlersToProviders(configuration.errorHandlers)
+      ]
     };
   }
 }
