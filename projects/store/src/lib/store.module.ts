@@ -57,7 +57,10 @@ export class StoreModule {
     const actions: Actions = injector.get(Actions);
     const errors: Errors = injector.get(Errors);
 
-    injector.get(STORE, undefined, InjectFlags.Optional);
+    try {
+      injector.get(STORE, undefined, InjectFlags.Optional);
+    } catch {
+    }
 
     const effects: Array<object> = injector.get(EFFECTS, [], InjectFlags.Optional);
     const errorHandlers: Array<object> = injector.get(ERROR_HANDLERS, [], InjectFlags.Optional);
