@@ -1,8 +1,6 @@
 import { Type } from '@monument/core';
 import { Actions, EffectMediator, ErrorMediator, Errors, Store } from '@monument/store';
 import { Inject, InjectionToken, ModuleWithProviders, NgModule, Optional, Provider } from '@angular/core';
-import { GlobalActions } from './global.actions';
-import { GlobalErrors } from './global.errors';
 
 const STORE: InjectionToken<Store<any, any>> = new InjectionToken('STORE');
 const EFFECTS: InjectionToken<Array<object>> = new InjectionToken('EFFECTS');
@@ -16,15 +14,17 @@ export interface StoreModuleConfiguration {
 
 @NgModule({
   providers: [
-    GlobalActions,
-    GlobalErrors,
     {
       provide: Actions,
-      useExisting: GlobalActions
+      useFactory() {
+        return new Actions();
+      }
     },
     {
       provide: Errors,
-      useExisting: GlobalErrors
+      useFactory() {
+        return new Errors();
+      }
     }
   ]
 })
@@ -37,8 +37,8 @@ export class StoreFeatureModule {
   private errorMediator: ErrorMediator;
 
   constructor(
-    actions: GlobalActions,
-    errors: GlobalErrors,
+    actions: Actions,
+    errors: Errors,
     @Optional() @Inject(STORE) store: Store<any, any> | null,
     @Optional() @Inject(EFFECTS) effects: Array<object> | null,
     @Optional() @Inject(ERROR_HANDLERS) errorHandlers: Array<object> | null
