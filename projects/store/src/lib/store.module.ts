@@ -12,14 +12,6 @@ export interface StoreModuleConfiguration {
   readonly errorHandlers?: Array<Type<object>>;
 }
 
-export function ActionsFactory(): Actions {
-  return new Actions();
-}
-
-export function ErrorsFactory(): Errors {
-  return new Errors();
-}
-
 export function ConvertEffectsToProviders(effects: Array<Type<object>> = []): Provider[] {
   return effects.map(effectsClass => {
     return {
@@ -40,26 +32,27 @@ export function ConvertErrorHandlersToProviders(effects: Array<Type<object>> = [
   });
 }
 
+// @dynamic
 @NgModule({
   providers: [
     {
       provide: Actions,
-      useFactory: ActionsFactory
+      useFactory(): Actions {
+        return new Actions();
+      }
     },
     {
       provide: Errors,
-      useFactory: ErrorsFactory
+      useFactory(): Errors {
+        return new Errors();
+      }
     }
   ]
 })
 export class StoreRootModule {
 }
 
-@NgModule({
-  imports: [
-    StoreRootModule
-  ]
-})
+@NgModule()
 export class StoreFeatureModule {
   private effectMediator: EffectMediator;
   private errorMediator: ErrorMediator;
