@@ -140,106 +140,8 @@ class CartErrorHandlers {
   }
 }
 
-function testStoreModule(description: string, setup: () => void) {
-  describe('StoreModule', () => {
-    describe(description, () => {
-      let actions: Actions;
-      let errors: Errors;
-      let cartStore: CartStore;
-      let actionsSpy: Spy;
-      let errorsSpy: Spy;
-      let consoleError: Spy;
-
-      beforeEach(() => {
-        setup();
-        actions = TestBed.get(Actions);
-        errors = TestBed.get(Errors);
-        cartStore = TestBed.get(CartStore);
-        actionsSpy = spyOn(actions, 'next').and.callThrough();
-        errorsSpy = spyOn(errors, 'next').and.callThrough();
-        consoleError = spyOn(console, 'error').and.stub();
-      });
-
-      it('should provide actions stream', () => {
-        expect(actions).toBeInstanceOf(Actions);
-      });
-
-      it('should provide errors stream', () => {
-        expect(errors).toBeInstanceOf(Errors);
-      });
-
-      it('should provide store instance', () => {
-        expect(cartStore).toBeInstanceOf(CartStore);
-      });
-
-      it('should invoke @Reaction and @Catch methods', () => {
-        expect(actionsSpy).toHaveBeenCalledTimes(0);
-        expect(errorsSpy).toHaveBeenCalledTimes(0);
-        expect(cartStore.snapshot).toEqual({
-          loading: false,
-          loaded: false,
-          products: [],
-          totalPrice: 0
-        });
-        actions.next(new Load(true));
-        expect(actionsSpy).toHaveBeenCalledTimes(2);
-        expect(actionsSpy).toHaveBeenNthCalledWith(1, new Load(true));
-        expect(actionsSpy).toHaveBeenNthCalledWith(2, new LoadSuccess([
-          {
-            name: 'Product1',
-            price: 1
-          },
-          {
-            name: 'Product2',
-            price: 2
-          }
-        ]));
-        expect(errorsSpy).toHaveBeenCalledTimes(0);
-        expect(cartStore.snapshot).toEqual({
-          loading: false,
-          loaded: true,
-          products: [
-            {
-              name: 'Product1',
-              price: 1
-            },
-            {
-              name: 'Product2',
-              price: 2
-            }
-          ],
-          totalPrice: 3
-        });
-        actions.next(new Load(false));
-        expect(cartStore.snapshot).toEqual({
-          loading: false,
-          loaded: true,
-          products: [],
-          totalPrice: 0,
-          error: new CartException('Error occurred while loading cart')
-        });
-        expect(consoleError).toHaveBeenNthCalledWith(1, new CartException('Error occurred while loading cart'));
-        expect(errorsSpy).toHaveBeenCalledTimes(1);
-      });
-    });
-  });
-}
-
-testStoreModule('forFeature()', () => {
-  TestBed.configureTestingModule({
-    imports: [
-      StoreModule.forRoot(),
-      StoreModule.forFeature({
-        store: CartStore,
-        effects: [CartEffects],
-        errorHandlers: [CartErrorHandlers]
-      })
-    ]
-  });
-});
-
 describe('StoreModule', () => {
-  describe('forRoot() only', () => {
+  describe('forRoot()', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [
@@ -248,12 +150,103 @@ describe('StoreModule', () => {
       });
     });
 
-    it('should provide Actions stream', () => {
+    it('should provide actions stream', () => {
       expect(TestBed.get(Actions)).toBeInstanceOf(Actions);
     });
 
-    it('should provide Errors stream', () => {
+    it('should provide errors stream', () => {
       expect(TestBed.get(Errors)).toBeInstanceOf(Errors);
+    });
+  });
+
+  describe('forFeature()', () => {
+    let actions: Actions;
+    let errors: Errors;
+    let cartStore: CartStore;
+    let actionsSpy: Spy;
+    let errorsSpy: Spy;
+    let consoleError: Spy;
+
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        imports: [
+          StoreModule.forRoot(),
+          StoreModule.forFeature({
+            store: CartStore,
+            effects: [CartEffects],
+            errorHandlers: [CartErrorHandlers]
+          })
+        ]
+      });
+
+      actions = TestBed.get(Actions);
+      errors = TestBed.get(Errors);
+      cartStore = TestBed.get(CartStore);
+      actionsSpy = spyOn(actions, 'next').and.callThrough();
+      errorsSpy = spyOn(errors, 'next').and.callThrough();
+      consoleError = spyOn(console, 'error').and.stub();
+    });
+
+    it('should provide actions stream', () => {
+      expect(actions).toBeInstanceOf(Actions);
+    });
+
+    it('should provide errors stream', () => {
+      expect(errors).toBeInstanceOf(Errors);
+    });
+
+    it('should provide store instance', () => {
+      expect(cartStore).toBeInstanceOf(CartStore);
+    });
+
+    it('should invoke @Reaction and @Catch methods', () => {
+      expect(actionsSpy).toHaveBeenCalledTimes(0);
+      expect(errorsSpy).toHaveBeenCalledTimes(0);
+      expect(cartStore.snapshot).toEqual({
+        loading: false,
+        loaded: false,
+        products: [],
+        totalPrice: 0
+      });
+      actions.next(new Load(true));
+      expect(actionsSpy).toHaveBeenCalledTimes(2);
+      expect(actionsSpy).toHaveBeenNthCalledWith(1, new Load(true));
+      expect(actionsSpy).toHaveBeenNthCalledWith(2, new LoadSuccess([
+        {
+          name: 'Product1',
+          price: 1
+        },
+        {
+          name: 'Product2',
+          price: 2
+        }
+      ]));
+      expect(errorsSpy).toHaveBeenCalledTimes(0);
+      expect(cartStore.snapshot).toEqual({
+        loading: false,
+        loaded: true,
+        products: [
+          {
+            name: 'Product1',
+            price: 1
+          },
+          {
+            name: 'Product2',
+            price: 2
+          }
+        ],
+        totalPrice: 3
+      });
+      actions.next(new Load(false));
+      expect(cartStore.snapshot).toEqual({
+        loading: false,
+        loaded: true,
+        products: [],
+        totalPrice: 0,
+        error: new CartException('Error occurred while loading cart')
+      });
+      expect(consoleError).toHaveBeenNthCalledWith(1, new CartException('Error occurred while loading cart'));
+      expect(errorsSpy).toHaveBeenCalledTimes(1);
     });
   });
 });

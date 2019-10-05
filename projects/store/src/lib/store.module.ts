@@ -6,33 +6,48 @@ const STORE: InjectionToken<Store<any, any>> = new InjectionToken('STORE');
 const EFFECTS: InjectionToken<Array<object>> = new InjectionToken('EFFECTS');
 const ERROR_HANDLERS: InjectionToken<Array<object>> = new InjectionToken('ERROR_HANDLERS');
 
-export interface StoreModuleConfiguration {
+export interface FeatureConfiguration {
   readonly store?: Type<Store<any, any>>;
   readonly effects?: Array<Type<object>>;
   readonly errorHandlers?: Array<Type<object>>;
 }
 
-@NgModule({
-  providers: [
-    {
-      provide: Actions,
-      useFactory() {
-        return new Actions();
-      }
-    },
-    {
-      provide: Errors,
-      useFactory() {
-        return new Errors();
-      }
-    }
-  ]
-})
-export class StoreRootModule {
-}
-
 @NgModule()
-export class StoreFeatureModule {
+export class StoreModule {
+  static forRoot(feature: FeatureConfiguration = {}): ModuleWithProviders<StoreModule> {
+    return {
+      ngModule: StoreModule,
+      providers: [
+        {
+          provide: Actions,
+          useFactory() {
+            return new Actions();
+          }
+        },
+        {
+          provide: Errors,
+          useFactory() {
+            return new Errors();
+          }
+        },
+        ...getStoreProvider(feature.store),
+        ...getEffectsProviders(feature.effects),
+        ...getErrorHandlersProviders(feature.errorHandlers)
+      ]
+    };
+  }
+
+  static forFeature(feature: FeatureConfiguration): ModuleWithProviders<StoreModule> {
+    return {
+      ngModule: StoreModule,
+      providers: [
+        ...getStoreProvider(feature.store),
+        ...getEffectsProviders(feature.effects),
+        ...getErrorHandlersProviders(feature.errorHandlers)
+      ]
+    };
+  }
+
   private effectMediator: EffectMediator;
   private errorMediator: ErrorMediator;
 
@@ -48,49 +63,47 @@ export class StoreFeatureModule {
   }
 }
 
-export class StoreModule {
-  static forRoot(): ModuleWithProviders {
-    return {
-      ngModule: StoreRootModule
-    };
+export function getStoreProvider(ctor?: Type<Store<any, any>>): Provider[] {
+  const providers: Provider[] = [];
+
+  if (ctor) {
+    providers.push(ctor);
+    providers.push({
+      provide: STORE,
+      useExisting: ctor,
+      multi: true
+    });
   }
 
-  static forFeature(configuration: StoreModuleConfiguration): ModuleWithProviders {
-    const providers: Provider[] = [];
+  return providers;
+}
 
-    if (configuration.store) {
-      providers.push(
-        configuration.store,
-        {
-          provide: STORE,
-          useExisting: configuration.store
-        }
-      );
-    }
+export function getEffectsProviders(ctors: Array<Type<object>> = []): Provider[] {
+  const providers: Provider[] = [];
 
-    if (configuration.effects) {
-      for (const effect of configuration.effects) {
-        providers.push({
-          provide: EFFECTS,
-          useClass: effect,
-          multi: true
-        });
-      }
-    }
-
-    if (configuration.errorHandlers) {
-      for (const errorHandler of configuration.errorHandlers) {
-        providers.push({
-          provide: ERROR_HANDLERS,
-          useClass: errorHandler,
-          multi: true
-        });
-      }
-    }
-
-    return {
-      ngModule: StoreFeatureModule,
-      providers
-    };
+  for (const ctor of ctors) {
+    providers.push(ctor);
+    providers.push({
+      provide: EFFECTS,
+      useExisting: ctor,
+      multi: true
+    });
   }
+
+  return providers;
+}
+
+export function getErrorHandlersProviders(ctors: Array<Type<object>> = []): Provider[] {
+  const providers: Provider[] = [];
+
+  for (const ctor of ctors) {
+    providers.push(ctor);
+    providers.push({
+      provide: ERROR_HANDLERS,
+      useExisting: ctor,
+      multi: true
+    });
+  }
+
+  return providers;
 }
