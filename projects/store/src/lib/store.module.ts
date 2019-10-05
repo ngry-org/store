@@ -60,8 +60,8 @@ export class StoreModule {
     } catch {
     }
 
-    const effects: Array<object> = injector.get(EFFECTS, [], InjectFlags.Optional);
-    const errorHandlers: Array<object> = injector.get(ERROR_HANDLERS, [], InjectFlags.Optional);
+    const effects: Array<object> = injector.get(EFFECTS, [], InjectFlags.Optional) || [];
+    const errorHandlers: Array<object> = injector.get(ERROR_HANDLERS, [], InjectFlags.Optional) || [];
 
     this.effectMediator = new EffectMediator(actions, effects);
     this.errorMediator = new ErrorMediator(errors, errorHandlers);
