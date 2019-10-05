@@ -52,6 +52,7 @@ export function ConvertErrorHandlersToProviders(effects: Array<Type<object>> = [
 export class StoreRootModule {
 }
 
+// @dynamic
 @NgModule()
 export class StoreFeatureModule {
   private effectMediator: EffectMediator;
