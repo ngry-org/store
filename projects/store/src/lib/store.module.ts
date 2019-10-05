@@ -48,7 +48,6 @@ export class StoreFeatureModule {
   }
 }
 
-@NgModule()
 export class StoreModule {
   static forRoot(): ModuleWithProviders {
     return {
