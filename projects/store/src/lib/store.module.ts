@@ -12,27 +12,26 @@ export interface StoreModuleConfiguration {
   readonly errorHandlers?: Array<Type<object>>;
 }
 
-export function ConvertEffectsToProviders(effects: Array<Type<object>> = []): Provider[] {
-  return effects.map(effectsClass => {
-    return {
+export function ConvertEffectsToProviders(providers: Provider[], effects: Array<Type<object>> = []) {
+  for (const effect of effects) {
+    providers.push({
       provide: EFFECTS,
-      useClass: effectsClass,
+      useClass: effect,
       multi: true
-    };
-  });
+    });
+  }
 }
 
-export function ConvertErrorHandlersToProviders(effects: Array<Type<object>> = []): Provider[] {
-  return effects.map(errorHandlerClass => {
-    return {
+export function ConvertErrorHandlersToProviders(providers: Provider[], errorHandlers: Array<Type<object>> = []) {
+  for (const errorHandler of errorHandlers) {
+    providers.push({
       provide: ERROR_HANDLERS,
-      useClass: errorHandlerClass,
+      useClass: errorHandler,
       multi: true
-    };
-  });
+    });
+  }
 }
 
-// @dynamic
 @NgModule({
   providers: [
     {
@@ -52,7 +51,6 @@ export function ConvertErrorHandlersToProviders(effects: Array<Type<object>> = [
 export class StoreRootModule {
 }
 
-// @dynamic
 @NgModule()
 export class StoreFeatureModule {
   private effectMediator: EffectMediator;
@@ -70,7 +68,6 @@ export class StoreFeatureModule {
   }
 }
 
-// @dynamic
 @NgModule()
 export class StoreModule {
   static forRoot(): ModuleWithProviders {
@@ -80,22 +77,27 @@ export class StoreModule {
   }
 
   static forFeature(configuration: StoreModuleConfiguration): ModuleWithProviders {
+    const providers: Provider[] = [];
+
+    if (configuration.store) {
+      providers.push(
+        {
+          provide: configuration.store,
+          useClass: configuration.store
+        },
+        {
+          provide: STORE,
+          useExisting: configuration.store
+        }
+      );
+    }
+
+    ConvertEffectsToProviders(providers, configuration.effects);
+    ConvertErrorHandlersToProviders(providers, configuration.errorHandlers);
+
     return {
       ngModule: StoreFeatureModule,
-      providers: [
-        ...(configuration.store ? [
-          {
-            provide: configuration.store,
-            useClass: configuration.store
-          },
-          {
-            provide: STORE,
-            useExisting: configuration.store
-          }
-        ] : []),
-        ...ConvertEffectsToProviders(configuration.effects),
-        ...ConvertErrorHandlersToProviders(configuration.errorHandlers)
-      ]
+      providers
     };
   }
 }
