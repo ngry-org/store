@@ -1,6 +1,6 @@
 import { Type } from '@monument/core';
 import { Actions, EffectMediator, ErrorMediator, Errors, Store } from '@monument/store';
-import { Inject, InjectionToken, ModuleWithProviders, NgModule, Optional, Provider } from '@angular/core';
+import { InjectFlags, InjectionToken, Injector, ModuleWithProviders, NgModule, Provider } from '@angular/core';
 
 const STORE: InjectionToken<Store<any, any>> = new InjectionToken('STORE');
 const EFFECTS: InjectionToken<Array<object>> = new InjectionToken('EFFECTS');
@@ -52,14 +52,18 @@ export class StoreModule {
   private errorMediator: ErrorMediator;
 
   constructor(
-    actions: Actions,
-    errors: Errors,
-    @Optional() @Inject(STORE) store: Store<any, any> | null,
-    @Optional() @Inject(EFFECTS) effects: Array<object> | null,
-    @Optional() @Inject(ERROR_HANDLERS) errorHandlers: Array<object> | null
+    injector: Injector
   ) {
-    this.effectMediator = new EffectMediator(actions, effects || []);
-    this.errorMediator = new ErrorMediator(errors, errorHandlers || []);
+    const actions: Actions = injector.get(Actions);
+    const errors: Errors = injector.get(Errors);
+
+    injector.get(STORE, undefined, InjectFlags.Optional);
+
+    const effects: Array<object> = injector.get(EFFECTS, [], InjectFlags.Optional);
+    const errorHandlers: Array<object> = injector.get(ERROR_HANDLERS, [], InjectFlags.Optional);
+
+    this.effectMediator = new EffectMediator(actions, effects);
+    this.errorMediator = new ErrorMediator(errors, errorHandlers);
   }
 }
 
