@@ -60,10 +60,7 @@ export class StoreModule {
 
     if (configuration.store) {
       providers.push(
-        {
-          provide: configuration.store,
-          useClass: configuration.store
-        },
+        configuration.store,
         {
           provide: STORE,
           useExisting: configuration.store
