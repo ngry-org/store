@@ -15,6 +15,8 @@ export interface FeatureConfiguration {
 @NgModule()
 export class StoreModule {
   static forRoot(feature: FeatureConfiguration = {}): ModuleWithProviders<StoreModule> {
+    const featureProviders: Provider[] = getFeatureProviders(feature);
+
     return {
       ngModule: StoreModule,
       providers: [
@@ -30,21 +32,17 @@ export class StoreModule {
             return new Errors();
           }
         },
-        ...getStoreProvider(feature.store),
-        ...getEffectsProviders(feature.effects),
-        ...getErrorHandlersProviders(feature.errorHandlers)
+        ...featureProviders
       ]
     };
   }
 
   static forFeature(feature: FeatureConfiguration): ModuleWithProviders<StoreModule> {
+    const featureProviders: Provider[] = getFeatureProviders(feature);
+
     return {
       ngModule: StoreModule,
-      providers: [
-        ...getStoreProvider(feature.store),
-        ...getEffectsProviders(feature.effects),
-        ...getErrorHandlersProviders(feature.errorHandlers)
-      ]
+      providers: featureProviders
     };
   }
 
@@ -70,25 +68,19 @@ export class StoreModule {
   }
 }
 
-export function getStoreProvider(ctor?: Type<Store<any, any>>): Provider[] {
+export function getFeatureProviders({store, effects = [], errorHandlers = []}: FeatureConfiguration): Provider[] {
   const providers: Provider[] = [];
 
-  if (ctor) {
-    providers.push(ctor);
+  if (store) {
+    providers.push(store);
     providers.push({
       provide: STORE,
-      useExisting: ctor,
+      useExisting: store,
       multi: true
     });
   }
 
-  return providers;
-}
-
-export function getEffectsProviders(ctors: Array<Type<object>> = []): Provider[] {
-  const providers: Provider[] = [];
-
-  for (const ctor of ctors) {
+  for (const ctor of effects) {
     providers.push(ctor);
     providers.push({
       provide: EFFECTS,
@@ -97,13 +89,7 @@ export function getEffectsProviders(ctors: Array<Type<object>> = []): Provider[]
     });
   }
 
-  return providers;
-}
-
-export function getErrorHandlersProviders(ctors: Array<Type<object>> = []): Provider[] {
-  const providers: Provider[] = [];
-
-  for (const ctor of ctors) {
+  for (const ctor of errorHandlers) {
     providers.push(ctor);
     providers.push({
       provide: ERROR_HANDLERS,
