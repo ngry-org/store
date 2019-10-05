@@ -12,26 +12,6 @@ export interface StoreModuleConfiguration {
   readonly errorHandlers?: Array<Type<object>>;
 }
 
-export function ConvertEffectsToProviders(providers: Provider[], effects: Array<Type<object>> = []) {
-  for (const effect of effects) {
-    providers.push({
-      provide: EFFECTS,
-      useClass: effect,
-      multi: true
-    });
-  }
-}
-
-export function ConvertErrorHandlersToProviders(providers: Provider[], errorHandlers: Array<Type<object>> = []) {
-  for (const errorHandler of errorHandlers) {
-    providers.push({
-      provide: ERROR_HANDLERS,
-      useClass: errorHandler,
-      multi: true
-    });
-  }
-}
-
 @NgModule({
   providers: [
     {
@@ -92,8 +72,25 @@ export class StoreModule {
       );
     }
 
-    ConvertEffectsToProviders(providers, configuration.effects);
-    ConvertErrorHandlersToProviders(providers, configuration.errorHandlers);
+    if (configuration.effects) {
+      for (const effect of configuration.effects) {
+        providers.push({
+          provide: EFFECTS,
+          useClass: effect,
+          multi: true
+        });
+      }
+    }
+
+    if (configuration.errorHandlers) {
+      for (const errorHandler of configuration.errorHandlers) {
+        providers.push({
+          provide: ERROR_HANDLERS,
+          useClass: errorHandler,
+          multi: true
+        });
+      }
+    }
 
     return {
       ngModule: StoreFeatureModule,
