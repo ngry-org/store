@@ -1,6 +1,6 @@
 import { Type } from '@monument/core';
 import { Actions, EffectMediator, ErrorMediator, Errors, Store } from '@monument/store';
-import { InjectionToken, Injector, ModuleWithProviders, NgModule } from '@angular/core';
+import { InjectFlags, InjectionToken, Injector, ModuleWithProviders, NgModule } from '@angular/core';
 
 export interface FeatureConfiguration {
   readonly store?: Type<Store<any, any>>;
@@ -8,11 +8,11 @@ export interface FeatureConfiguration {
   readonly errorHandlers?: Array<Type<object>>;
 }
 
-const FEATURE_CONFIGURATION: InjectionToken<FeatureConfiguration> = new InjectionToken('FEATURE_CONFIGURATION');
+export const FEATURE_CONFIGURATION: InjectionToken<FeatureConfiguration> = new InjectionToken('FEATURE_CONFIGURATION');
 
 @NgModule({})
 export class StoreModule {
-  static forRoot(feature: FeatureConfiguration = {}): ModuleWithProviders<StoreModule> {
+  static forRoot(): ModuleWithProviders<StoreModule> {
     return {
       ngModule: StoreModule,
       providers: [
@@ -27,14 +27,7 @@ export class StoreModule {
           useFactory() {
             return new Errors();
           }
-        },
-        {
-          provide: FEATURE_CONFIGURATION,
-          useValue: feature
-        },
-        ...(feature.store ? [feature.store] : []),
-        ...(feature.effects || []),
-        ...(feature.errorHandlers || [])
+        }
       ]
     };
   }
@@ -61,7 +54,7 @@ export class StoreModule {
     const actions: Actions = injector.get(Actions);
     const errors: Errors = injector.get(Errors);
 
-    const feature = injector.get(FEATURE_CONFIGURATION);
+    const feature = injector.get(FEATURE_CONFIGURATION, {}, InjectFlags.Optional);
 
     if (feature.store) {
       try {
