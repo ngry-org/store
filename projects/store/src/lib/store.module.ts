@@ -1,6 +1,6 @@
 import { Type } from '@monument/core';
 import { Actions, EffectMediator, ErrorMediator, Errors, Store } from '@monument/store';
-import { Inject, InjectFlags, InjectionToken, Injector, ModuleWithProviders, NgModule } from '@angular/core';
+import { InjectionToken, Injector, ModuleWithProviders, NgModule } from '@angular/core';
 
 export interface FeatureConfiguration {
   readonly store?: Type<Store<any, any>>;
