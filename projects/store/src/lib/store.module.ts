@@ -57,12 +57,11 @@ export class StoreModule {
   private effectMediator: EffectMediator;
   private errorMediator: ErrorMediator;
 
-  constructor(
-    @Inject(FEATURE_CONFIGURATION) feature: FeatureConfiguration,
-    injector: Injector
-  ) {
+  constructor(injector: Injector) {
     const actions: Actions = injector.get(Actions);
     const errors: Errors = injector.get(Errors);
+
+    const feature = injector.get(FEATURE_CONFIGURATION);
 
     if (feature.store) {
       try {
