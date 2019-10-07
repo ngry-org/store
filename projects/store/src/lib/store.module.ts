@@ -1,10 +1,6 @@
 import { Type } from '@monument/core';
 import { Actions, EffectMediator, ErrorMediator, Errors, Store } from '@monument/store';
-import { InjectFlags, InjectionToken, Injector, ModuleWithProviders, NgModule, Provider } from '@angular/core';
-
-const STORE: InjectionToken<Store<any, any>> = new InjectionToken('STORE');
-const EFFECTS: InjectionToken<Array<object>> = new InjectionToken('EFFECTS');
-const ERROR_HANDLERS: InjectionToken<Array<object>> = new InjectionToken('ERROR_HANDLERS');
+import { Inject, InjectFlags, InjectionToken, Injector, ModuleWithProviders, NgModule } from '@angular/core';
 
 export interface FeatureConfiguration {
   readonly store?: Type<Store<any, any>>;
@@ -12,11 +8,11 @@ export interface FeatureConfiguration {
   readonly errorHandlers?: Array<Type<object>>;
 }
 
-@NgModule()
+const FEATURE_CONFIGURATION: InjectionToken<FeatureConfiguration> = new InjectionToken('FEATURE_CONFIGURATION');
+
+@NgModule({})
 export class StoreModule {
   static forRoot(feature: FeatureConfiguration = {}): ModuleWithProviders<StoreModule> {
-    const featureProviders: Provider[] = getFeatureProviders(feature);
-
     return {
       ngModule: StoreModule,
       providers: [
@@ -32,17 +28,29 @@ export class StoreModule {
             return new Errors();
           }
         },
-        ...featureProviders
+        {
+          provide: FEATURE_CONFIGURATION,
+          useValue: feature
+        },
+        ...(feature.store ? [feature.store] : []),
+        ...(feature.effects || []),
+        ...(feature.errorHandlers || [])
       ]
     };
   }
 
   static forFeature(feature: FeatureConfiguration): ModuleWithProviders<StoreModule> {
-    const featureProviders: Provider[] = getFeatureProviders(feature);
-
     return {
       ngModule: StoreModule,
-      providers: featureProviders
+      providers: [
+        {
+          provide: FEATURE_CONFIGURATION,
+          useValue: feature
+        },
+        ...(feature.store ? [feature.store] : []),
+        ...(feature.effects || []),
+        ...(feature.errorHandlers || [])
+      ]
     };
   }
 
@@ -50,53 +58,23 @@ export class StoreModule {
   private errorMediator: ErrorMediator;
 
   constructor(
+    @Inject(FEATURE_CONFIGURATION) feature: FeatureConfiguration,
     injector: Injector
   ) {
     const actions: Actions = injector.get(Actions);
     const errors: Errors = injector.get(Errors);
 
-    try {
-      injector.get(STORE, undefined, InjectFlags.Optional);
-    } catch {
+    if (feature.store) {
+      try {
+        injector.get(feature.store);
+      } catch {
+      }
     }
 
-    const effects: Array<object> = injector.get(EFFECTS, [], InjectFlags.Optional) || [];
-    const errorHandlers: Array<object> = injector.get(ERROR_HANDLERS, [], InjectFlags.Optional) || [];
+    const effects: Array<object> = (feature.effects || []).map(ctor => injector.get(ctor));
+    const errorHandlers: Array<object> = (feature.errorHandlers || []).map(ctor => injector.get(ctor));
 
     this.effectMediator = new EffectMediator(actions, effects);
     this.errorMediator = new ErrorMediator(errors, errorHandlers);
   }
-}
-
-export function getFeatureProviders({store, effects = [], errorHandlers = []}: FeatureConfiguration): Provider[] {
-  const providers: Provider[] = [];
-
-  if (store) {
-    providers.push(store);
-    providers.push({
-      provide: STORE,
-      useExisting: store,
-      multi: true
-    });
-  }
-
-  for (const ctor of effects) {
-    providers.push(ctor);
-    providers.push({
-      provide: EFFECTS,
-      useExisting: ctor,
-      multi: true
-    });
-  }
-
-  for (const ctor of errorHandlers) {
-    providers.push(ctor);
-    providers.push({
-      provide: ERROR_HANDLERS,
-      useExisting: ctor,
-      multi: true
-    });
-  }
-
-  return providers;
 }
