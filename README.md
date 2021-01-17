@@ -1,13 +1,9 @@
-![build](https://github.com/ngry-project/store/workflows/build/badge.svg?branch=master)
-![unit-tests](https://github.com/ngry-project/store/workflows/unit-tests/badge.svg?branch=master)
-![code-style](https://github.com/ngry-project/store/workflows/code-style/badge.svg?branch=master)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/ngry-project/store?logo=github)
-![npm (scoped)](https://img.shields.io/npm/v/@ngry/store?logo=npm)
-![Coveralls github](https://img.shields.io/coveralls/github/ngry-project/store?logo=jest)
-
-## Description
-
-[Description]
+[![build](https://github.com/ngry-project/store/workflows/build/badge.svg?branch=master)](https://github.com/ngry-project/store/actions?query=workflow%3Abuild)
+[![unit-tests](https://github.com/ngry-project/store/workflows/unit-tests/badge.svg?branch=master)](https://github.com/ngry-project/store/actions?query=workflow%3Aunit-tests)
+[![code-style](https://github.com/ngry-project/store/workflows/code-style/badge.svg?branch=master)](https://github.com/ngry-project/store/actions?query=workflow%3Acode-style)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/ngry-project/store?logo=github)](https://github.com/ngry-project/store/releases)
+[![npm (scoped)](https://img.shields.io/npm/v/@ngry/store?logo=npm)](https://www.npmjs.com/package/@ngry/store)
+[![Coveralls github](https://img.shields.io/coveralls/github/ngry-project/store?logo=jest)](https://coveralls.io/github/ngry-project/store)
 
 ## Installation
 
