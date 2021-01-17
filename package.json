@@ -1,44 +1,76 @@
 {
-  "name": "store",
-  "version": "0.0.0",
+  "name": "@ngry/store",
+  "description": "Reactive state management for Angular",
+  "version": "0.0.0-development",
+  "keywords": [
+    "angular",
+    "store",
+    "state",
+    "actionbus",
+    "action",
+    "effect",
+    "effects"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ngry-project/store"
+  },
+  "maintainers": [
+    {
+      "name": "Alex Chugaev",
+      "url": "https://github.com/avchugaev"
+    }
+  ],
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --prod",
     "test": "ng test",
+    "test:coverage": "ng test --coverage",
+    "test:coverage:watch": "ng test --coverage --watch",
     "test:watch": "ng test --watch",
-    "lint": "ng lint",
-    "e2e": "ng e2e",
-    "deploy": "npm run lint && npm run test && npm run build && cd dist/store && npm publish --access public"
+    "lint": "ng lint"
   },
-  "private": true,
-  "dependencies": {
-    "@angular/common": "~8.2.9",
-    "@angular/compiler": "~8.2.9",
-    "@angular/core": "~8.2.9",
-    "@angular/platform-browser": "~8.2.9",
-    "@angular/platform-browser-dynamic": "~8.2.9",
-    "@monument/core": "~0.15.2",
-    "@monument/store": "~0.15.2",
-    "rxjs": "~6.5.3",
-    "tslib": "^1.10.0",
-    "zone.js": "~0.10.2"
+  "publishConfig": {
+    "access": "public"
   },
   "devDependencies": {
-    "@angular-builders/jest": "^8.2.0",
-    "@angular-devkit/build-angular": "~0.803.6",
-    "@angular-devkit/build-ng-packagr": "~0.803.6",
-    "@angular/cli": "~8.3.8",
-    "@angular/compiler-cli": "~8.2.9",
-    "@angular/language-service": "~8.2.9",
-    "@types/jest": "^24.0.18",
-    "@types/node": "~8.10.54",
-    "codelyzer": "^5.1.2",
-    "jest": "^24.9.0",
-    "ng-packagr": "^5.5.1",
-    "ts-node": "~8.4.1",
-    "tsickle": "^0.37.0",
-    "tslint": "~5.20.0",
-    "typescript": "~3.5.3"
+    "@angular-builders/jest": "^11.0.0",
+    "@angular-devkit/build-angular": "^0.1100.6",
+    "@angular-devkit/build-ng-packagr": "~0.1000.8",
+    "@angular/cli": "~11.0.7",
+    "@angular/common": "~11.0.7",
+    "@angular/compiler": "~11.0.7",
+    "@angular/compiler-cli": "~11.0.7",
+    "@angular/core": "~11.0.7",
+    "@angular/forms": "~11.0.7",
+    "@angular/platform-browser": "~11.0.7",
+    "@angular/platform-browser-dynamic": "~11.0.7",
+    "@ngry/rx": "^11.5.1",
+    "@types/jest": "^26.0.20",
+    "@types/node": "^12.11.1",
+    "codelyzer": "^6.0.0",
+    "jest": "^26.6.3",
+    "ng-packagr": "^11.0.3",
+    "reflect-metadata": "~0.1.13",
+    "rxjs": "~6.6.3",
+    "ts-node": "~8.3.0",
+    "tslib": "^1.14.1",
+    "tslint": "~6.1.0",
+    "typescript": "~4.0.5",
+    "zone.js": "~0.11.3"
+  },
+  "peerDependencies": {
+    "@angular/common": "~11.0.7",
+    "@angular/core": "~11.0.7",
+    "@angular/platform-browser": "~11.0.7",
+    "@angular/platform-browser-dynamic": "~11.0.7",
+    "@ngry/rx": "^11.4.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "~6.6.3",
+    "zone.js": "~0.11.3"
+  },
+  "publish": {
+    "pkgRoot": "dist"
   }
 }
