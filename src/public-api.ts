@@ -7,7 +7,7 @@ export * from './lib/action/actions';
 export * from './lib/action/action-handler';
 
 export * from './lib/effects/effects.module';
-export * from './lib/effects/effects.registry';
+export * from './lib/effects/effects-registry';
 export * from './lib/effects/effects-provider';
 
 export * from './lib/entity-store/entity-collection';

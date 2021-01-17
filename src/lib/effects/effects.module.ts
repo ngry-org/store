@@ -1,6 +1,6 @@
 import { Inject, InjectionToken, Injector, ModuleWithProviders, NgModule, Type } from '@angular/core';
 import { EffectsProvider } from './effects-provider';
-import { EffectsRegistry } from './effects.registry';
+import { EffectsRegistry } from './effects-registry';
 
 export const EFFECTS = new InjectionToken('EFFECTS');
 
