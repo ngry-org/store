@@ -5,21 +5,26 @@
   "projects": {
     "store": {
       "projectType": "library",
-      "root": "projects/store",
-      "sourceRoot": "projects/store/src",
-      "prefix": "ngry",
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
-            "tsConfig": "projects/store/tsconfig.lib.json",
-            "project": "projects/store/ng-package.json"
+            "tsConfig": "tsconfig.lib.json",
+            "project": "ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "tsconfig.lib.prod.json"
+            }
           }
         },
         "test": {
           "builder": "@angular-builders/jest:run",
           "options": {
-            "tsConfig": "projects/store/tsconfig.spec.json",
+            "tsConfig": "tsconfig.spec.json",
             "verbose": true
           }
         },
@@ -27,8 +32,8 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "projects/store/tsconfig.lib.json",
-              "projects/store/tsconfig.spec.json"
+              "tsconfig.lib.json",
+              "tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"
@@ -36,6 +41,10 @@
           }
         }
       }
-    }},
+    }
+  },
+  "cli": {
+    "analytics": false
+  },
   "defaultProject": "store"
 }
