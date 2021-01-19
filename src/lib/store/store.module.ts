@@ -6,7 +6,7 @@ export const FEATURE_STATE = new InjectionToken<object>('Feature state');
 @NgModule()
 export class StoreModule {
   /**
-   *
+   * Registers {@link FeatureStore}s for every state provider.
    * @param providers List of state providers
    */
   static forFeature(providers: Array<InjectableProvider>): ModuleWithProviders<StoreModule> {
