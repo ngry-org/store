@@ -10,13 +10,13 @@
 Using NPM:
 
 ```bash
-npm i @ngry/store
+npm i @ngry/store @ngry/rx
 ```
 
 Using Yarn:
 
 ```bash
-yarn add @ngry/store
+yarn add @ngry/store @ngry/rx
 ```
 
 ## Store
@@ -393,6 +393,7 @@ class CartService {
 Design you custom store by extending `LocalStore<TState>` and providing selectors, updaters and effects.
 
 ```ts
+import { switchMap, take, tap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { LocalStore } from '@ngry/store';
 
@@ -421,6 +422,24 @@ class CartStore extends LocalStore<Cart> {
       )),
     );
   });
+}
+```
+
+Then add it to component's `providers`:
+
+```ts
+import { Component } from '@angular/core';
+
+@Component({
+  providers: [
+    CartStore,
+  ],
+})
+class CartComponent {
+  constructor(
+    readonly store: CartStore,
+  ) {
+  }
 }
 ```
 
@@ -477,6 +496,8 @@ class HouseCollectionStore extends EntityCollectionStore<number, House, HouseCol
 To consume the store data inject the store in your component:
 
 ```ts
+import { Component } from '@angular/core';
+
 @Component()
 class HouseCollectionComponent {
   constructor(
@@ -511,6 +532,9 @@ class Loaded {
 Effects often delegate some async work to service layer.
 
 ```ts
+import { Observable, of } from 'rxjs';
+import { Injectable } from '@angular/core';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -521,17 +545,21 @@ class TestService {
 }
 ```
 
-Design custom effects provider by extending `EffectsProvider`.
+Design custom effects providers by extending `EffectsProvider`.
 
 In its nutshell, effects provider is just a collection of action streams.
 
 In most cases you will use `Actions` provider as a source of actions.
 
 ```ts
-import { Actions, EffectsProvider, dispatch } from '@ngry/store';
-import { ofType } from '@ngry/rx';
+import { map, switchMap, tap } from 'rxjs/operators';
+import { Injectable } from '@angular/core';
+import { Actions, EffectsProvider } from '@ngry/store';
+import { dispatch, ofType } from '@ngry/rx';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 class TestEffects extends EffectsProvider {
   constructor(
     // 👇 Actions is a global (provided in root) stream of actions
@@ -555,6 +583,23 @@ class TestEffects extends EffectsProvider {
       ),
     ]);
   }
+}
+```
+
+Register effects providers with feature module:
+
+```ts
+import { NgModule } from '@angular/core';
+import { EffectsModule } from '@ngry/store';
+
+@NgModule({
+  imports: [
+    EffectsModule.forFeature([
+      TestEffects,
+    ]),
+  ],
+})
+class MyFeatureModule {
 }
 ```
 
