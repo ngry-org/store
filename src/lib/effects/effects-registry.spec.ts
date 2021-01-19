@@ -5,6 +5,7 @@ import { TestBed } from '@angular/core/testing';
 import { dispatch, ofType } from '@ngry/rx';
 import { Actions } from '../action/actions';
 import { EffectsProvider } from './effects-provider';
+import { EffectsRegistry } from './effects-registry';
 import { EffectsModule } from './effects.module';
 
 class Load {
@@ -30,7 +31,9 @@ class TestService {
   }
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 class TestEffects extends EffectsProvider {
   constructor(
     actions: Actions,
@@ -59,6 +62,8 @@ class TestEffects extends EffectsProvider {
 describe('EffectsRegistry', () => {
   describe('register', () => {
     let actions: Actions;
+    let registry: EffectsRegistry;
+    let effects: TestEffects;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
@@ -70,9 +75,11 @@ describe('EffectsRegistry', () => {
       });
 
       actions = TestBed.inject(Actions);
+      registry = TestBed.inject(EffectsRegistry);
+      effects = TestBed.inject(TestEffects);
     });
 
-    it('should connect effects to action bus', (done) => {
+    it('should register effects providers', (done) => {
       actions.pipe(
         take(2),
         toArray(),
@@ -86,6 +93,12 @@ describe('EffectsRegistry', () => {
       });
 
       actions.next(new Load(1));
+    });
+
+    it('should throw error when register the same effects provider twice', () => {
+      expect(() => {
+        registry.register(effects);
+      }).toThrow(`Effects provider TestEffects already registered`);
     });
   });
 });
