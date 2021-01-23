@@ -52,7 +52,12 @@
       "timeEnd",
       "trace"
     ],
-    "no-empty": false,
+    "no-empty": {
+      "severity": "warning"
+    },
+    "no-empty-interface": {
+      "severity": "warning"
+    },
     "no-inferrable-types": [
       true,
       "ignore-params"
