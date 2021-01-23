@@ -13,6 +13,10 @@ import { EffectsProvider } from './effects-provider';
 export class EffectsRegistry {
   private readonly providers = new Set<EffectsProvider>();
 
+  /**
+   * Initializes new instance
+   * @param actions Stream of actions
+   */
   constructor(
     private readonly actions: Actions,
   ) {
@@ -31,10 +35,6 @@ export class EffectsRegistry {
 
     this.providers.add(provider);
 
-    for (const effect of provider.effects) {
-      effect.subscribe(action => {
-        Promise.resolve().then(() => this.actions.next(action));
-      });
-    }
+    provider.bridgeTo(this.actions);
   }
 }
