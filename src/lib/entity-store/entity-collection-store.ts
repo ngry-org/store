@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import { OnDestroy } from '@angular/core';
 import { StoreBase } from '../store/store-base';
 import { CompareFunction, PredicateFunction } from '../types';
@@ -10,6 +10,8 @@ export class EntityCollectionStore<ID, TEntity, TCollection extends EntityCollec
 
   readonly ids: Observable<ReadonlyArray<ID>>;
   readonly entities: Observable<ReadonlyArray<TEntity>>;
+  readonly length: Observable<number>;
+  readonly empty: Observable<boolean>;
 
   constructor(
     initial: TCollection,
@@ -17,11 +19,23 @@ export class EntityCollectionStore<ID, TEntity, TCollection extends EntityCollec
     super(initial);
 
     this.ids = this.state.pipe(
-      map(state => state.ids),
+      map(collection => collection.ids),
+      distinctUntilChanged(),
     );
 
     this.entities = this.state.pipe(
-      map(state => state.entities),
+      map(collection => collection.entities),
+      distinctUntilChanged(),
+    );
+
+    this.length = this.state.pipe(
+      map(collection => collection.length),
+      distinctUntilChanged(),
+    );
+
+    this.empty = this.state.pipe(
+      map(collection => collection.empty),
+      distinctUntilChanged(),
     );
   }
 
@@ -37,12 +51,20 @@ export class EntityCollectionStore<ID, TEntity, TCollection extends EntityCollec
     this.next(this.snapshot.addMany(entities));
   }
 
-  insert(position: number, entity: TEntity): void {
-    this.next(this.snapshot.insert(position, entity));
+  update(entity: TEntity): void {
+    this.next(this.snapshot.update(entity));
   }
 
-  insertMany(position: number, entities: Iterable<TEntity>): void {
-    this.next(this.snapshot.insertMany(position, entities));
+  updateMany(entities: Iterable<TEntity>): void {
+    this.next(this.snapshot.updateMany(entities));
+  }
+
+  set(entity: TEntity): void {
+    this.next(this.snapshot.set(entity));
+  }
+
+  setMany(entities: Iterable<TEntity>): void {
+    this.next(this.snapshot.setMany(entities));
   }
 
   delete(id: ID): void {
@@ -63,10 +85,6 @@ export class EntityCollectionStore<ID, TEntity, TCollection extends EntityCollec
 
   clear(): void {
     this.next(this.snapshot.clear());
-  }
-
-  update(entity: TEntity): void {
-    this.next(this.snapshot.update(entity));
   }
 
   filter(predicate: PredicateFunction<TEntity>): void {
