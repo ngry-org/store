@@ -36,9 +36,12 @@ export abstract class LocalStore<TState> extends StoreBase<TState> implements On
    */
   protected updater<T = never>(delegate: (state: TState, value: T) => TState): (value: T) => void {
     return value => {
+      const oldState = this.snapshot;
       const newState = delegate(this.snapshot, value);
 
-      this.next(newState);
+      if (oldState !== newState) {
+        this.next(newState);
+      }
     };
   }
 
