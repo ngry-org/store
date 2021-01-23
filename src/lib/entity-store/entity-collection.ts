@@ -3,7 +3,6 @@ import { ArrayCompatible, CompareFunction, PredicateFunction } from '../types';
 /**
  * Represents immutable collection of entities.
  */
-// tslint:disable-next-line:max-line-length
 export abstract class EntityCollection<ID, TEntity, TCollection extends EntityCollection<ID, TEntity, any>>
   implements Iterable<TEntity>, ArrayCompatible<TEntity> {
 
@@ -22,10 +21,11 @@ export abstract class EntityCollection<ID, TEntity, TCollection extends EntityCo
     entities: Iterable<TEntity> = [],
   ) {
     const _entities = [...entities].reduce((accumulator, entity) => {
-      const idx = accumulator.findIndex(_entity => this.selectId(_entity) === this.selectId(entity));
+      const index = this.selectId(entity);
+      const _index = accumulator.findIndex(_entity => this.selectId(_entity) === index);
 
-      if (idx >= 0) {
-        accumulator.splice(idx, 1);
+      if (_index >= 0) {
+        accumulator.splice(_index, 1);
       }
 
       accumulator.push(entity);
@@ -48,8 +48,8 @@ export abstract class EntityCollection<ID, TEntity, TCollection extends EntityCo
   }
 
   has(id: ID): boolean {
-    for (const _ of this.ids) {
-      if (this.compareIds(_, id)) {
+    for (const _id of this.ids) {
+      if (this.compareIds(_id, id)) {
         return true;
       }
     }
@@ -62,55 +62,65 @@ export abstract class EntityCollection<ID, TEntity, TCollection extends EntityCo
   }
 
   add(entity: TEntity): TCollection {
+    if (this.includes(entity)) {
+      return this as unknown as TCollection;
+    }
+
     return this.create(
       [...this.entities, entity],
     );
   }
 
   addMany(entities: Iterable<TEntity>): TCollection {
-    let empty = true;
+    let collection: TCollection = this as unknown as TCollection;
 
-    for (const _ of entities) {
-      empty = false;
-      break;
+    for (const entity of entities) {
+      collection = collection.add(entity);
     }
 
-    if (empty) {
-      return this as unknown as TCollection;
-    }
-
-    return this.create(
-      [...this.entities, ...entities],
-    );
+    return collection;
   }
 
-  insert(position: number, entity: TEntity): TCollection {
-    const before = this.entities.slice(0, position);
-    const after = this.entities.slice(position);
+  update(entity: TEntity): TCollection {
+    const index = this.entities.findIndex(_entity => this.compareIds(this.selectId(entity), this.selectId(_entity)));
 
-    return this.create(
-      [...before, entity, ...after],
-    );
+    if (index >= 0) {
+      const entities = [...this.entities];
+
+      entities[index] = entity;
+
+      return this.create(entities);
+    }
+
+    return this as unknown as TCollection;
   }
 
-  insertMany(position: number, entities: Iterable<TEntity>): TCollection {
-    let empty = true;
+  updateMany(entities: Iterable<TEntity>): TCollection {
+    let collection = this as unknown as TCollection;
 
-    for (const _ of entities) {
-      empty = false;
-      break;
+    for (const entity of entities) {
+      collection = collection.update(entity);
     }
 
-    if (empty) {
-      return this as unknown as TCollection;
+    return collection;
+  }
+
+  set(entity: TEntity): TCollection {
+    if (this.includes(entity)) {
+      return this.update(entity);
+    } else {
+      return this.add(entity);
+    }
+  }
+
+  setMany(entities: Iterable<TEntity>): TCollection {
+    let collection: TCollection = this as unknown as TCollection;
+
+    for (const entity of entities) {
+      collection = collection.set(entity);
     }
 
-    const before = this.entities.slice(0, position);
-    const after = this.entities.slice(position);
-
-    return this.create(
-      [...before, ...entities, ...after],
-    );
+    return collection;
   }
 
   delete(id: ID): TCollection {
@@ -150,40 +160,32 @@ export abstract class EntityCollection<ID, TEntity, TCollection extends EntityCo
   }
 
   removeMany(entities: Iterable<TEntity>): TCollection {
-    const ids: Array<ID> = [];
+    const ids: Set<ID> = new Set<ID>();
 
     for (const entity of entities) {
-      ids.push(this.selectId(entity));
+      ids.add(this.selectId(entity));
     }
 
     return this.deleteMany(ids);
   }
 
   clear(): TCollection {
+    if (this.empty) {
+      return this as unknown as TCollection;
+    }
+
     return this.create([]);
   }
 
-  update(entity: TEntity): TCollection {
-    const id = this.selectId(entity);
-    const index = this.entities.findIndex(_entity => {
-      const _id = this.selectId(_entity);
+  filter(predicate: PredicateFunction<TEntity>): TCollection {
+    const length = this.entities.length;
+    const entities = this.entities.filter(entity => predicate(entity));
 
-      return this.compareIds(id, _id);
-    });
-
-    if (index >= 0) {
-      const entities = [...this.entities];
-
-      entities[index] = entity;
-
-      return this.create(entities);
+    if (entities.length === length) {
+      return this as unknown as TCollection;
     }
 
-    return this as unknown as TCollection;
-  }
-
-  filter(predicate: PredicateFunction<TEntity>): TCollection {
-    return this.create(this.entities.filter(entity => predicate(entity)));
+    return this.create(entities);
   }
 
   sort(compare: CompareFunction<TEntity>): TCollection {
