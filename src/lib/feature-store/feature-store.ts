@@ -4,16 +4,31 @@ import { ActionHandler } from '../action/action-handler';
 import { StateMetadata } from '../state/state-metadata';
 import { StoreBase } from '../store/store-base';
 
+/**
+ * Represents feature store which maintains the lifecycle of feature state.
+ * @since 1.0.0
+ * @author Alex Chugaev
+ */
 export class FeatureStore<TState extends object = object, TAction extends IAction = IAction> extends StoreBase<TState> {
   private readonly handlers: Array<ActionHandler<TState>>;
 
+  /**
+   * Initializes new instance.
+   * @param state Initial state
+   */
   constructor(state: TState) {
     super(state);
 
     const metadata = StateMetadata.of(state.constructor as Type<TState>);
+
     this.handlers = metadata.handlers;
   }
 
+  /**
+   * Dispatches an action to trigger state update.
+   * @param action Instance of action
+   * @since 1.0.0
+   */
   dispatch(action: TAction): void {
     for (const handler of this.handlers) {
       if (handler.handles(action)) {
