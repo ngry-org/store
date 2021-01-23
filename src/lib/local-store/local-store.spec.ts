@@ -81,7 +81,9 @@ class CartService {
   }
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 class CartStore extends LocalStore<TaskState<Cart>> {
   readonly cart = this.select(state => state.result);
   readonly cartId = this.select(state => state.result?.id);
@@ -161,12 +163,6 @@ describe('LocalStore', () => {
   let store: CartStore;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      providers: [
-        CartStore,
-      ],
-    }).compileComponents();
-
     store = TestBed.inject(CartStore);
   });
 
@@ -182,8 +178,9 @@ describe('LocalStore', () => {
       store.cartId.pipe(
         take(2),
         toArray(),
-      ).subscribe(ids => {
-        expect(ids).toEqual([undefined, 1]);
+      ).subscribe(snapshots => {
+        expect(snapshots[0]).toBe(undefined);
+        expect(snapshots[1]).toBe(1);
 
         done();
       });
@@ -198,9 +195,7 @@ describe('LocalStore', () => {
         take(1),
         toArray(),
       ).subscribe(snapshots => {
-        expect(snapshots).toEqual([
-          undefined,
-        ]);
+        expect(snapshots[0]).toBe(undefined);
 
         done();
       });
@@ -218,8 +213,8 @@ describe('LocalStore', () => {
       store.cart.pipe(
         take(2),
         toArray(),
-      ).subscribe(ids => {
-        expect(ids).toEqual([
+      ).subscribe(snapshots => {
+        expect(snapshots).toEqual([
           undefined,
           {
             id: 1,
