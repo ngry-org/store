@@ -332,7 +332,6 @@ export abstract class EntityCollection<ID, TEntity, TCollection extends EntityCo
    * Create new instance of collection.
    * @param entities Iterable source of entities
    * @since 1.0.0
-   * @protected
    */
   protected abstract create(entities: Iterable<TEntity>): TCollection;
 
@@ -340,7 +339,6 @@ export abstract class EntityCollection<ID, TEntity, TCollection extends EntityCo
    * Returns an ID of given entity.
    * @param entity Instance of entity
    * @since 1.0.0
-   * @protected
    */
   protected abstract selectId(entity: TEntity): ID;
 
@@ -349,7 +347,6 @@ export abstract class EntityCollection<ID, TEntity, TCollection extends EntityCo
    * @param a ID of left entity
    * @param b ID of right entity
    * @since 1.0.0
-   * @protected
    */
   protected abstract compareIds(a: ID, b: ID): boolean;
 }

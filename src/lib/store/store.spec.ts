@@ -5,31 +5,31 @@ import { On } from '../state/decorator/on.decorator';
 import { Store } from './store';
 import { StoreModule } from './store.module';
 
-export class Load {
+class Load {
 }
 
-export class Loaded {
+class Loaded {
   constructor(
     readonly items: Array<CartItem>,
   ) {
   }
 }
 
-export class Failed {
+class Failed {
   constructor(
     readonly error: Error,
   ) {
   }
 }
 
-export class Put {
+class Put {
   constructor(
     readonly item: CartItem,
   ) {
   }
 }
 
-export class CartItem {
+class CartItem {
   constructor(
     readonly productId: number,
     readonly quantity: number,
@@ -37,7 +37,7 @@ export class CartItem {
   }
 }
 
-export class CartState {
+class CartState {
 
   constructor(
     readonly loading = false,
