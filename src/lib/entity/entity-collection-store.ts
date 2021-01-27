@@ -1,6 +1,4 @@
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
-import { OnDestroy } from '@angular/core';
 import { StoreBase } from '../store/store-base';
 import { CompareFunction, PredicateFunction } from '../types';
 import { EntityCollection } from './entity-collection';
@@ -11,7 +9,7 @@ import { EntityCollection } from './entity-collection';
  * @author Alex Chugaev
  */
 export class EntityCollectionStore<ID, TEntity, TCollection extends EntityCollection<ID, TEntity, any>>
-  extends StoreBase<TCollection> implements OnDestroy {
+  extends StoreBase<TCollection> {
 
   /**
    * Gets stream of entities IDs.
@@ -46,29 +44,10 @@ export class EntityCollectionStore<ID, TEntity, TCollection extends EntityCollec
   ) {
     super(initial);
 
-    this.ids = this.state.pipe(
-      map(collection => collection.ids),
-      distinctUntilChanged(),
-    );
-
-    this.entities = this.state.pipe(
-      map(collection => collection.entities),
-      distinctUntilChanged(),
-    );
-
-    this.length = this.state.pipe(
-      map(collection => collection.length),
-      distinctUntilChanged(),
-    );
-
-    this.empty = this.state.pipe(
-      map(collection => collection.empty),
-      distinctUntilChanged(),
-    );
-  }
-
-  ngOnDestroy(): void {
-    this.complete();
+    this.ids = this.select(collection => collection.ids);
+    this.entities = this.select(collection => collection.entities);
+    this.length = this.select(collection => collection.length);
+    this.empty = this.select(collection => collection.empty);
   }
 
   /**

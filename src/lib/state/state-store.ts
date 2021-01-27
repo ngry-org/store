@@ -1,15 +1,15 @@
 import { Type } from '@angular/core';
 import { IAction } from '../action/action.interface';
 import { ActionHandler } from '../action/action-handler';
-import { StateMetadata } from '../state/state-metadata';
+import { StateMetadata } from './state-metadata';
 import { StoreBase } from '../store/store-base';
 
 /**
- * Represents feature store which maintains the lifecycle of feature state.
- * @since 1.0.0
+ * Represents store which maintains the lifecycle of state.
+ * @since 5.0.0
  * @author Alex Chugaev
  */
-export class FeatureStore<TState extends object = object, TAction extends IAction = IAction> extends StoreBase<TState> {
+export class StateStore<TState extends object = object, TAction extends IAction = IAction> extends StoreBase<TState> {
   private readonly handlers: Array<ActionHandler<TState>>;
 
   /**
@@ -27,7 +27,7 @@ export class FeatureStore<TState extends object = object, TAction extends IActio
   /**
    * Dispatches an action to trigger state update.
    * @param action Instance of action
-   * @since 1.0.0
+   * @since 5.0.0
    */
   dispatch(action: TAction): void {
     for (const handler of this.handlers) {
