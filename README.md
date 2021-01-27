@@ -13,15 +13,16 @@ Install the package:
 npm i @ngry/store
 ```
 
-Optionally, install `@ngry/rx` for useful operators like `dispatch`:
+Optionally, install [`@ngry/rx`](https://www.npmjs.com/package/@ngry/rx) for useful operators like `ofType`
+and `dispatch`:
 
 ```bash
 npm i @ngry/rx
 ```
 
-## Store
+## Global store
 
-**Store** provides access to the pool of states of shared features. In simpler words it's a container of shared state.
+**Store** is a container of shared state(s).
 
 Design state in a form of an _immutable_ class and decorate action handlers with `@On()` decorator.
 
@@ -169,11 +170,107 @@ class CartComponent implements OnInit {
 }
 ```
 
-## Base Store
+## Effects
 
-You can build stores in less verbose manner using `StoreBase` class.
+**Effects** let you isolate side effects like HTTP requests into separate class.
 
-Design state in a form of _immutable_ class(es).
+Design actions in a form of simple classes.
+
+```ts
+class Load {
+  constructor(
+    readonly id: number,
+  ) {
+  }
+}
+
+class Loaded {
+  constructor(
+    readonly result: number,
+  ) {
+  }
+}
+```
+
+Effects often delegate some async work to service layer.
+
+```ts
+import { Observable, of } from 'rxjs';
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root',
+})
+class TestService {
+  get(id: number): Observable<number> {
+    return of(id + 1);
+  }
+}
+```
+
+Design custom effects providers by extending `EffectsProvider`.
+
+In its nutshell, effects provider is just a collection of action streams.
+
+In most cases you will use `Actions` provider as a source of actions.
+
+```ts
+import { map, switchMap, tap } from 'rxjs/operators';
+import { Injectable } from '@angular/core';
+import { Actions, EffectsProvider } from '@ngry/store';
+import { dispatch, ofType } from '@ngry/rx';
+
+@Injectable({
+  providedIn: 'root'
+})
+class TestEffects extends EffectsProvider {
+  constructor(
+    // 👇 Actions is a global (provided in root) stream of actions
+    actions: Actions,
+    service: TestService,
+  ) {
+    super([
+      actions.pipe(
+        ofType(Load),
+        switchMap(action => service.get(action.id)),
+        map(result => new Loaded(result)),
+      ),
+
+      actions.pipe(
+        ofType(Load),
+        tap(action => {
+          // Perform some side effects. For example, push notification.
+        }),
+        // Break circular dispatching of Load action
+        dispatch(false),
+      ),
+    ]);
+  }
+}
+```
+
+Register effects providers with feature module:
+
+```ts
+import { NgModule } from '@angular/core';
+import { EffectsModule } from '@ngry/store';
+
+@NgModule({
+  imports: [
+    EffectsModule.forFeature([
+      TestEffects,
+    ]),
+  ],
+})
+class MyFeatureModule {
+}
+```
+
+## Abstract store
+
+You can build stores in less verbose manner using abstract `StoreBase` class.
+
+Design state in a form of _immutable_ class:
 
 ```ts
 class CheckboxState {
@@ -297,102 +394,6 @@ class HouseCollectionComponent {
     readonly store: HouseCollectionStore,
   ) {
   }
-}
-```
-
-## Effects
-
-**Effects** is a mechanism that lets you produce new actions as reaction to some other ones.
-
-Design actions in a form of simple classes.
-
-```ts
-class Load {
-  constructor(
-    readonly id: number,
-  ) {
-  }
-}
-
-class Loaded {
-  constructor(
-    readonly result: number,
-  ) {
-  }
-}
-```
-
-Effects often delegate some async work to service layer.
-
-```ts
-import { Observable, of } from 'rxjs';
-import { Injectable } from '@angular/core';
-
-@Injectable({
-  providedIn: 'root',
-})
-class TestService {
-  get(id: number): Observable<number> {
-    return of(id + 1);
-  }
-}
-```
-
-Design custom effects providers by extending `EffectsProvider`.
-
-In its nutshell, effects provider is just a collection of action streams.
-
-In most cases you will use `Actions` provider as a source of actions.
-
-```ts
-import { map, switchMap, tap } from 'rxjs/operators';
-import { Injectable } from '@angular/core';
-import { Actions, EffectsProvider } from '@ngry/store';
-import { dispatch, ofType } from '@ngry/rx';
-
-@Injectable({
-  providedIn: 'root'
-})
-class TestEffects extends EffectsProvider {
-  constructor(
-    // 👇 Actions is a global (provided in root) stream of actions
-    actions: Actions,
-    service: TestService,
-  ) {
-    super([
-      actions.pipe(
-        ofType(Load),
-        switchMap(action => service.get(action.id)),
-        map(result => new Loaded(result)),
-      ),
-
-      actions.pipe(
-        ofType(Load),
-        tap(action => {
-          // Perform some side effects. For example, push notification.
-        }),
-        // Break circular dispatching of Load action
-        dispatch(false),
-      ),
-    ]);
-  }
-}
-```
-
-Register effects providers with feature module:
-
-```ts
-import { NgModule } from '@angular/core';
-import { EffectsModule } from '@ngry/store';
-
-@NgModule({
-  imports: [
-    EffectsModule.forFeature([
-      TestEffects,
-    ]),
-  ],
-})
-class MyFeatureModule {
 }
 ```
 
