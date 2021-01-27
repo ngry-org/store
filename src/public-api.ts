@@ -10,16 +10,13 @@ export * from './lib/effects/effects.module';
 export * from './lib/effects/effects-registry';
 export * from './lib/effects/effects-provider';
 
-export * from './lib/entity-store/entity-collection';
-export * from './lib/entity-store/entity-collection-store';
-
-export * from './lib/feature-store/feature-store';
-export * from './lib/feature-store/feature-registry';
-
-export * from './lib/local-store/local-store';
+export * from './lib/entity/entity-collection';
+export * from './lib/entity/entity-collection-store';
 
 export * from './lib/state/decorator/on.decorator';
 export * from './lib/state/state-metadata';
+export * from './lib/state/state-store';
+export * from './lib/state/state-registry';
 
 export * from './lib/store/store';
 export * from './lib/store/store-base';

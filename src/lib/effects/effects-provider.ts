@@ -18,7 +18,6 @@ export abstract class EffectsProvider {
    * Initializes an effects provider.
    * @param effects Collection of action streams.
    * @since 1.0.0
-   * @protected
    */
   protected constructor(
     effects: Iterable<Observable<IAction>>,

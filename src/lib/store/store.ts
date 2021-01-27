@@ -2,10 +2,10 @@ import { Observable } from 'rxjs';
 import { Injectable, Type } from '@angular/core';
 import { IAction } from '../action/action.interface';
 import { Actions } from '../action/actions';
-import { FeatureRegistry } from '../feature-store/feature-registry';
+import { StateRegistry } from '../state/state-registry';
 
 /**
- * Represents global store. In a nutshell it's an aggregate of feature stores.
+ * Represents global store. In a nutshell it's an aggregate of states stores.
  * @since 1.0.0
  * @author Alex Chugaev
  */
@@ -17,11 +17,11 @@ export class Store {
   /**
    * Initializes new instance.
    * @param actions Stream of actions
-   * @param features Registry of features stores
+   * @param states Registry of states stores
    */
   constructor(
     private actions: Actions,
-    private features: FeatureRegistry,
+    private states: StateRegistry,
   ) {
   }
 
@@ -31,11 +31,11 @@ export class Store {
    * @since 1.0.0
    */
   select<TState extends object>(type: Type<TState>): Observable<TState> {
-    return this.features.select(type).state;
+    return this.states.select(type).state;
   }
 
   /**
-   * Dispatches an action to trigger state update in features stores.
+   * Dispatches an action to trigger state update in states stores.
    * @param action Instance of action
    * @since 1.0.0
    */
