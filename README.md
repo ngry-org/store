@@ -333,6 +333,41 @@ class CheckboxStore extends StoreBase<CheckboxState> {
 }
 ```
 
+## Router store
+
+You can build stores around Angular `Router` and `ActivatedRoute` using abstract `RouterStoreBase` class.
+
+Design state in a form of _immutable_ class or interface:
+
+```ts
+interface PaginationState {
+  readonly page: number;
+  readonly size: number;
+}
+```
+
+Create custom router store by extending `RouterStoreBase<TState>` class:
+
+```ts
+import { Injectable, Injector } from '@angular/core';
+import { RouterStoreBase } from '@ngry/store';
+
+@Injectable()
+class PaginationStore extends RouterStoreBase<PaginationState> {
+  readonly page$ = this.select(state => state.page);
+  readonly size$ = this.select(state => state.size);
+
+  constructor(injector: Injector) {
+    super(injector, {
+      page: 1,
+      size: 20,
+    }, 'pagination');
+  }
+
+  public setPage = this.updater((state, page: number) => ({...state, page}));
+}
+```
+
 ## Entity Store
 
 **Entity store** is a convenient way to manage a list of entities (objects with identity).
