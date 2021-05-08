@@ -1,5 +1,13 @@
 import { NextObserver, Observable, Subject } from 'rxjs';
-import { concatMap, distinctUntilChanged, map, publishReplay, refCount, takeUntil } from 'rxjs/operators';
+import {
+  concatMap,
+  distinctUntilChanged,
+  distinctUntilKeyChanged,
+  map,
+  publishReplay,
+  refCount,
+  takeUntil,
+} from 'rxjs/operators';
 import { Injector, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -54,6 +62,7 @@ export abstract class RouterStoreBase<TState> implements NextObserver<TState>, O
     this.router = injector.get(Router);
     this.state = this.route.queryParams.pipe(
       takeUntil(this.destroySubject),
+      distinctUntilKeyChanged(this.paramName),
       map(() => this.snapshot),
       publishReplay(1),
       refCount(),
