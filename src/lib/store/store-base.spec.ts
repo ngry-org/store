@@ -26,12 +26,28 @@ class CheckboxState {
 
     return this;
   }
+
+  disable(): CheckboxState {
+    if (!this.disabled) {
+      return new CheckboxState(this.checked, true);
+    }
+
+    return this;
+  }
+
+  enable(): CheckboxState {
+    if (this.disabled) {
+      return new CheckboxState(this.checked, false);
+    }
+
+    return this;
+  }
 }
 
 @Injectable({
   providedIn: 'root',
 })
-class CheckboxStore extends StoreBase<CheckboxState> {
+class TestStore extends StoreBase<CheckboxState> {
   readonly checked$ = this.select(state => state.checked);
   readonly disabled$ = this.select(state => state.disabled);
 
@@ -51,23 +67,26 @@ class CheckboxStore extends StoreBase<CheckboxState> {
     );
   });
 
-  public setDisabled = this.updater((state, disabled: boolean) => {
+  readonly setDisabled = this.updater((state, disabled: boolean) => {
     return state.setDisabled(disabled);
   });
+
+  readonly disable = this.updater(state => state.disable());
+
+  readonly enable = this.updater(state => state.enable());
 }
 
 describe('StoreBase', () => {
-  let store: CheckboxStore;
+  let store: TestStore;
 
   beforeEach(async () => {
-    store = TestBed.inject(CheckboxStore);
+    store = TestBed.inject(TestStore);
   });
 
   describe('constructor', () => {
     it('should be a base abstract class', () => {
       expect(store).toBeInstanceOf(StoreBase);
-      expect(store).toBeInstanceOf(CheckboxStore);
-      expect(store.closed).toBe(false);
+      expect(store).toBeInstanceOf(TestStore);
     });
   });
 
@@ -96,6 +115,7 @@ describe('StoreBase', () => {
 
       store.setDisabled(true);
       store.setDisabled(true);
+      store.disable();
       store.complete();
     });
   });
@@ -118,6 +138,8 @@ describe('StoreBase', () => {
 
   describe('ngOnDestroy', () => {
     it('should complete state stream', () => {
+      expect(store.closed).toBe(false);
+
       store.ngOnDestroy();
 
       expect(store.closed).toBe(true);
