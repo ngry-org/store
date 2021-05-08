@@ -88,13 +88,15 @@ export abstract class StoreBase<TState> implements NextObserver<TState>, Complet
 
   /**
    * Creates method that updates state.
-   * @param delegate Function that produces new state based on current one and value
+   * @param delegate Function that calculates a new state from current one and a set of arguments.
    * @since 5.0.0
    */
-  protected updater<TValue = never>(delegate: (state: TState, value: TValue) => TState): (value: TValue) => void {
-    return value => {
+  protected updater<TArgs extends readonly unknown[] = unknown[]>(
+    delegate: (state: TState, ...args: TArgs) => TState,
+  ): (...args: TArgs) => void {
+    return (...args: TArgs) => {
       const oldState = this.snapshot;
-      const newState = delegate(this.snapshot, value);
+      const newState = delegate(this.snapshot, ...args);
 
       if (oldState !== newState) {
         this.next(newState);
