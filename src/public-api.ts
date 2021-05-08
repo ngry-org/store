@@ -13,6 +13,8 @@ export * from './lib/effects/effects-provider';
 export * from './lib/entity/entity-collection';
 export * from './lib/entity/entity-collection-store';
 
+export * from './lib/router/router-store-base';
+
 export * from './lib/state/decorator/on.decorator';
 export * from './lib/state/state-metadata';
 export * from './lib/state/state-store';
